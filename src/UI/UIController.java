@@ -95,7 +95,7 @@ public class UIController extends AnimationTimer {
         transition.setCycleCount(1);
         transition.setDuration(Duration.seconds(3));
         transition.play();
-        
+
         bullets.add(bullet);
 
     }
@@ -107,6 +107,9 @@ public class UIController extends AnimationTimer {
         lblGameOver.setVisible(false);
         moveMeCircle.setCenterX(50);
         moveMeCircle.setCenterY(360);
+        start=0;
+        fps=0;
+        spawnRate=0;
     }
 
     @Override
@@ -166,7 +169,7 @@ public class UIController extends AnimationTimer {
             rand = new Random();
             int posX = 1280;
             int posY = rand.nextInt(720);
-            //rectangles.add(new Rectangle(posX, posY, 100, 50));
+            rectangles.add(new Rectangle(posX, posY, 100, 50));
         }
 
 
@@ -229,9 +232,6 @@ public class UIController extends AnimationTimer {
 
         for (Rectangle rect : rectangles) {
             rect.setX(rect.getX() + deltaX);
-        }
-        for (Bullet bullet : bullets) {
-
         }
     }
 
