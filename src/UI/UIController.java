@@ -2,12 +2,13 @@ package UI;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.PathTransition;
-import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.shape.*;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -53,16 +54,17 @@ public class UIController extends AnimationTimer {
 
         root.setOnMousePressed(mouseEvent -> {
             //System.out.println(mouseEvent.getButton());
-            switch (mouseEvent.getButton()) {
-                case SECONDARY:
-                    fire(mouseEvent);
-            }
+                switch (mouseEvent.getButton()) {
+                    case SECONDARY:
+                        fire(mouseEvent);
+                }
+
         });
         root.setOnKeyPressed(event -> {
             //System.out.println(event.getCode());
             switch (event.getCode()) {
                 case W:
-                    moveMeCircle.setCenterY(moveMeCircle.getCenterY() - deltaY * 3);
+                    moveMeCircle.setCenterY(moveMeCircle.getCenterY() - deltaY);
                     break;
                 case S:
                     moveMeCircle.setCenterY(moveMeCircle.getCenterY() + deltaY * 3);
@@ -85,8 +87,8 @@ public class UIController extends AnimationTimer {
 
         double angle = getAngleBetween(bullet);
         angle = angle * Math.PI / 180;
-        double endX   = bullet.getCenterX() + 4000 * Math.cos(angle);
-        double endY   = bullet.getCenterY() + 4000 * Math.sin(angle);
+        double endX = bullet.getCenterX() + 4000 * Math.cos(angle);
+        double endY = bullet.getCenterY() + 4000 * Math.sin(angle);
         Line line = new Line(bullet.getCenterX(), bullet.getCenterY(), endX, endY);
 
         PathTransition transition = new PathTransition();
@@ -107,9 +109,9 @@ public class UIController extends AnimationTimer {
         lblGameOver.setVisible(false);
         moveMeCircle.setCenterX(50);
         moveMeCircle.setCenterY(360);
-        start=0;
-        fps=0;
-        spawnRate=0;
+        start = 0;
+        fps = 0;
+        spawnRate = 0;
     }
 
     @Override
@@ -127,7 +129,7 @@ public class UIController extends AnimationTimer {
                 }
                 fps = 0;
                 start = l;
-                spawnRate += 0.2;
+                spawnRate += 0.05;
             }
         }
         updateElements();
@@ -188,7 +190,6 @@ public class UIController extends AnimationTimer {
         double rotation; //the angle to cast towards
 
 
-
         //tan only goes to 180 so reverse the angle when its on the left hand side
 
         if (xDistance > 0)
@@ -200,13 +201,11 @@ public class UIController extends AnimationTimer {
             rotation = angle;
 
 
-
         //if the angle is equal to 90 it must be inverted, this is to prevent a bug where the lines were drawn the wrong way
 
         if (Math.abs(angle) == 90)
 
             return -angle;
-
 
 
         return rotation;
@@ -223,7 +222,6 @@ public class UIController extends AnimationTimer {
         }
 
 
-
         for (Circle bullet : bullets) {
             if (!root.getChildren().contains(bullet)) {
                 root.getChildren().add(bullet);
@@ -231,7 +229,7 @@ public class UIController extends AnimationTimer {
         }
 
         for (Rectangle rect : rectangles) {
-            rect.setX(rect.getX() + deltaX);
+            rect.setX(rect.getX() + deltaX*2);
         }
     }
 
