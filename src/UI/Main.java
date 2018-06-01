@@ -18,8 +18,6 @@ public class Main extends Application {
         screen.setResizable(false);
         screen.sizeToScene();
         screen.show();
-
-
     }
 
     public static void main(String[] args) {
