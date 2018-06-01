@@ -41,7 +41,18 @@ public class UIController extends AnimationTimer {
 
     double spawnRate = 1;
 
+    boolean left = false;
+    boolean right = false;
+    boolean up = false;
+    boolean down = false;
+
+    boolean firing = true;
+
+    MouseEvent click;
+
     long start = 0;
+
+    long lastFire = 0;
 
     @FXML
     public void initialize() {
@@ -51,55 +62,84 @@ public class UIController extends AnimationTimer {
         lblGameOver.setVisible(false);
         root.getChildren().add(lblGameOver);
         super.start();
+        setHandlers();
+
+    }
+
+    private void setHandlers() {
 
         root.setOnMousePressed(mouseEvent -> {
             //System.out.println(mouseEvent.getButton());
-                switch (mouseEvent.getButton()) {
-                    case SECONDARY:
-                        fire(mouseEvent);
-                }
+            switch (mouseEvent.getButton()) {
+                case SECONDARY:
+                    firing = true;
+                    click = mouseEvent;
+            }
+        });
+
+        root.setOnMouseDragged(mouseEvent -> {
+            click = mouseEvent;
+        });
+
+        root.setOnMouseReleased(mouseEvent -> {
+            //System.out.println(mouseEvent.getButton());
+            switch (mouseEvent.getButton()) {
+                case SECONDARY:
+                    firing = false;
+                    click = mouseEvent;
+            }
 
         });
+
         root.setOnKeyPressed(event -> {
-            //System.out.println(event.getCode());
-            switch (event.getCode()) {
-                case W:
-                    moveMeCircle.setCenterY(moveMeCircle.getCenterY() - deltaY);
-                    break;
-                case S:
-                    moveMeCircle.setCenterY(moveMeCircle.getCenterY() + deltaY * 3);
-                    break;
-                case A:
-                    moveMeCircle.setCenterX(moveMeCircle.getCenterX() + deltaX * 3);
-                    break;
-                case D:
-                    moveMeCircle.setCenterX(moveMeCircle.getCenterX() - deltaX * 3);
-                    break;
-                case SPACE:
-                    restartGame();
-                    break;
+            if (event.getCode() == javafx.scene.input.KeyCode.W) {
+                up = true;
+            } else if (event.getCode() == javafx.scene.input.KeyCode.S) {
+                down = true;
+            } else if (event.getCode() == javafx.scene.input.KeyCode.A) {
+                left = true;
+            } else if (event.getCode() == javafx.scene.input.KeyCode.D) {
+                right = true;
+            } else if (event.getCode() == javafx.scene.input.KeyCode.SPACE) {
+                restartGame();
+
+            }
+        });
+
+        root.setOnKeyReleased(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.W) {
+                up = false;
+            } else if (event.getCode() == javafx.scene.input.KeyCode.S) {
+                down = false;
+            } else if (event.getCode() == javafx.scene.input.KeyCode.A) {
+                left = false;
+            } else if (event.getCode() == javafx.scene.input.KeyCode.D) {
+                right = false;
             }
         });
     }
 
-    private void fire(MouseEvent mouseEvent) {
-        Bullet bullet = new Bullet(moveMeCircle.getCenterX(), moveMeCircle.getCenterY(), mouseEvent.getX(), mouseEvent.getY());
+    private void fire(long l) {
+        if (l >= lastFire + 150000000) {
+            lastFire = l;
+            Bullet bullet = new Bullet(moveMeCircle.getCenterX(), moveMeCircle.getCenterY(), click.getX(), click.getY());
 
-        double angle = getAngleBetween(bullet);
-        angle = angle * Math.PI / 180;
-        double endX = bullet.getCenterX() + 4000 * Math.cos(angle);
-        double endY = bullet.getCenterY() + 4000 * Math.sin(angle);
-        Line line = new Line(bullet.getCenterX(), bullet.getCenterY(), endX, endY);
+            double angle = getAngleBetween(bullet);
+            angle = angle * Math.PI / 180;
+            double endX = bullet.getCenterX() + 4000 * Math.cos(angle);
+            double endY = bullet.getCenterY() + 4000 * Math.sin(angle);
+            Line line = new Line(bullet.getCenterX(), bullet.getCenterY(), endX, endY);
 
-        PathTransition transition = new PathTransition();
-        transition.setNode(bullet);
-        transition.setPath(line);
-        transition.setCycleCount(1);
-        transition.setDuration(Duration.seconds(3));
-        transition.play();
+            PathTransition transition = new PathTransition();
+            transition.setNode(bullet);
+            transition.setPath(line);
+            transition.setCycleCount(1);
+            transition.setDuration(Duration.seconds(3));
+            transition.play();
 
-        bullets.add(bullet);
-
+            bullets.add(bullet);
+            System.out.println(lastFire);
+        }
     }
 
     private void restartGame() {
@@ -133,10 +173,28 @@ public class UIController extends AnimationTimer {
             }
         }
         updateElements();
+        updateSprite();
         handleCollisions();
-
+        if (firing) {
+            fire(l);
+        }
         fps++;
 
+    }
+
+    private void updateSprite() {
+        if (up) {
+            moveMeCircle.setCenterY(moveMeCircle.getCenterY() - deltaY);
+        }
+        if (down) {
+            moveMeCircle.setCenterY(moveMeCircle.getCenterY() + deltaY);
+        }
+        if (right) {
+            moveMeCircle.setCenterX(moveMeCircle.getCenterX() - deltaX);
+        }
+        if (left) {
+            moveMeCircle.setCenterX(moveMeCircle.getCenterX() + deltaX);
+        }
     }
 
     private void handleCollisions() {
@@ -229,7 +287,7 @@ public class UIController extends AnimationTimer {
         }
 
         for (Rectangle rect : rectangles) {
-            rect.setX(rect.getX() + deltaX*2);
+            rect.setX(rect.getX() + deltaX * 2);
         }
     }
 
