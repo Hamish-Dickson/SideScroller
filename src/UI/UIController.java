@@ -26,7 +26,8 @@ public class UIController extends AnimationTimer {
     @FXML
     private AnchorPane root;
 
-    Label lblGameOver = new Label("Game over!\n Press space to restart");
+    @FXML
+    Label gameOverLbl;
 
     private ArrayList<Rectangle> rectangles = new ArrayList<>();
 
@@ -36,8 +37,6 @@ public class UIController extends AnimationTimer {
 
     int deltaX = -5;
     int deltaY = 5;
-
-    int bulletSpeed = 10;
 
     double spawnRate = 1;
 
@@ -56,14 +55,10 @@ public class UIController extends AnimationTimer {
 
     @FXML
     public void initialize() {
-        lblGameOver.setLayoutX(400);
-        lblGameOver.setLayoutY(100);
-        lblGameOver.setStyle("-fx-font: 72px 'Agency FB'; -fx-text-fill: blue; -fx-text-alignment: center");
-        lblGameOver.setVisible(false);
-        root.getChildren().add(lblGameOver);
         super.start();
         setHandlers();
-
+        gameOverLbl.setLayoutX(400);
+        gameOverLbl.setLayoutY(100);
     }
 
     private void setHandlers() {
@@ -71,24 +66,30 @@ public class UIController extends AnimationTimer {
         root.setOnMousePressed(mouseEvent -> {
             //System.out.println(mouseEvent.getButton());
             switch (mouseEvent.getButton()) {
-                case SECONDARY:
+                case PRIMARY:
                     firing = true;
                     click = mouseEvent;
+                case SECONDARY:
+                    break;
+                case MIDDLE:
+                    break;
             }
         });
 
-        root.setOnMouseDragged(mouseEvent -> {
-            click = mouseEvent;
-        });
+        root.setOnMouseDragged(mouseEvent -> click = mouseEvent);
 
         root.setOnMouseReleased(mouseEvent -> {
             //System.out.println(mouseEvent.getButton());
             switch (mouseEvent.getButton()) {
-                case SECONDARY:
+                case PRIMARY:
                     firing = false;
                     click = mouseEvent;
+                    break;
+                case SECONDARY:
+                    break;
+                case MIDDLE:
+                    break;
             }
-
         });
 
         root.setOnKeyPressed(event -> {
@@ -109,11 +110,14 @@ public class UIController extends AnimationTimer {
         root.setOnKeyReleased(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.W) {
                 up = false;
-            } else if (event.getCode() == javafx.scene.input.KeyCode.S) {
+            }
+            if (event.getCode() == javafx.scene.input.KeyCode.S) {
                 down = false;
-            } else if (event.getCode() == javafx.scene.input.KeyCode.A) {
+            }
+            if (event.getCode() == javafx.scene.input.KeyCode.A) {
                 left = false;
-            } else if (event.getCode() == javafx.scene.input.KeyCode.D) {
+            }
+            if (event.getCode() == javafx.scene.input.KeyCode.D) {
                 right = false;
             }
         });
@@ -138,7 +142,6 @@ public class UIController extends AnimationTimer {
             transition.play();
 
             bullets.add(bullet);
-            System.out.println(lastFire);
         }
     }
 
@@ -146,12 +149,18 @@ public class UIController extends AnimationTimer {
         root.getChildren().removeAll(rectangles);
         rectangles.clear();
         super.start();
-        lblGameOver.setVisible(false);
+        gameOverLbl.setVisible(false);
         moveMeCircle.setCenterX(50);
         moveMeCircle.setCenterY(360);
+
         start = 0;
         fps = 0;
         spawnRate = 0;
+
+        up = false;
+        left = false;
+        right = false;
+        down = false;
     }
 
     @Override
@@ -176,23 +185,31 @@ public class UIController extends AnimationTimer {
         updateSprite();
         handleCollisions();
         if (firing) {
-            fire(l);
+            try {
+                fire(l);
+            } catch (NullPointerException sleeeeeeper) {
+                //todo make this not thrown
+            }
         }
         fps++;
 
     }
 
     private void updateSprite() {
-        if (up) {
+        if (up && !(moveMeCircle.getCenterY() - moveMeCircle.getRadius() <= 0)) {
             moveMeCircle.setCenterY(moveMeCircle.getCenterY() - deltaY);
+            System.out.println(moveMeCircle.getCenterY());
+            System.out.println(moveMeCircle.getRadius());
         }
-        if (down) {
+        if (down && !(moveMeCircle.getCenterY() + moveMeCircle.getRadius() >= 720)) {
             moveMeCircle.setCenterY(moveMeCircle.getCenterY() + deltaY);
+            System.out.println(moveMeCircle.getCenterY());
         }
-        if (right) {
+        if (right && !(moveMeCircle.getCenterX() + moveMeCircle.getRadius() >= 1280)) {
             moveMeCircle.setCenterX(moveMeCircle.getCenterX() - deltaX);
+            System.out.println(moveMeCircle.getCenterX());
         }
-        if (left) {
+        if (left && !(moveMeCircle.getCenterX() - moveMeCircle.getRadius() <= 0)) {
             moveMeCircle.setCenterX(moveMeCircle.getCenterX() + deltaX);
         }
     }
@@ -202,7 +219,9 @@ public class UIController extends AnimationTimer {
             if (moveMeCircle.getLayoutBounds().intersects(rectangle.getLayoutBounds())) {
                 //System.out.println("COLLISION");
                 super.stop();
-                lblGameOver.setVisible(true);
+                gameOverLbl.setVisible(true);
+                gameOverLbl.toFront();
+
             }
         }
     }

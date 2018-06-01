@@ -3,7 +3,6 @@ package UI;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 
 /**
  * Created by hdd00002 on 29/05/2018.
@@ -42,11 +41,11 @@ public class Bullet extends Circle {
         } else {
             right = false;
         }
-        if(destinationX == getCenterX()){
-            horizontal=true;
+        if (destinationX == getCenterX()) {
+            horizontal = true;
         }
-        if(destinationY == getCenterY()){
-            vertical=true;
+        if (destinationY == getCenterY()) {
+            vertical = true;
         }
         if (destinationY > getCenterY()) {
             up = false;
@@ -73,8 +72,6 @@ public class Bullet extends Circle {
 
 */
     }
-
-
 
 
     public double getDestinationX() {

@@ -7,6 +7,7 @@
             stylesheets="@css/main.css" xmlns="http://javafx.com/javafx/10" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="UI.UIController">
     <children>
+        <Label fx:id="gameOverLbl" visible="false" layoutX="400" layoutY="100" text="Game over! &#13; Press space to restart" style="-fx-font: 72px 'Agency FB'; -fx-text-fill: blue; -fx-text-alignment: center"/>
         <Label fx:id="fpsLbl" prefWidth="200" AnchorPane.leftAnchor="0" style="-fx-text-fill: blueviolet; -fx-font:20px 'Agency FB'"/>
         <Circle radius="10" centerX="50" centerY="50" fx:id="moveMeCircle"/>
     </children>
